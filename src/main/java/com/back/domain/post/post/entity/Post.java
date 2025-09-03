@@ -33,6 +33,7 @@ public class Post extends BaseEntity {
     private List<PostComment> comments = new ArrayList<>();
 
 
+
     public Post(String title, String content) {
         this.title = title;
         this.content = content;
