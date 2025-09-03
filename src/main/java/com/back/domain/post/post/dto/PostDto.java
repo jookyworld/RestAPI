@@ -20,5 +20,4 @@ public class PostDto {
         this.subject = post.getTitle();
         this.body = post.getContent();
     }
-
 }
