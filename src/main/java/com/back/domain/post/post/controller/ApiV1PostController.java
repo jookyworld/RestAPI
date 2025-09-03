@@ -22,7 +22,7 @@ public class ApiV1PostController {
         List<Post> items = postService.getList();
         return items
                 .stream()
-                .map(post -> new PostDto(post))
+                .map(PostDto::new)
                 .toList();
     }
 
