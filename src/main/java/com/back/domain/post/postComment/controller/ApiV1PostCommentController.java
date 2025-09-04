@@ -7,10 +7,7 @@ import com.back.domain.post.postComment.entity.PostComment;
 import com.back.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -40,7 +37,7 @@ public class ApiV1PostCommentController {
     }
 
     @Transactional
-    @GetMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
     public RsData<Void> deleteItem(@PathVariable long postId,  @PathVariable long id) {
         Post post = postService.findById(postId);
         PostComment postComment = post.findCommentById(id).get();
