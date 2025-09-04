@@ -1,28 +1,28 @@
 spring:
   application:
-    name: RestAPI              # ?????? ?? (??, ????, ??? ?? ?? ???)
+    name: RestAPI     # Application name
   profiles:
-    active: dev                # ?? ???? profile (?: dev, prod, test)
+    active: dev        # Active profile (dev, test, prod)
   output:
     ansi:
-      enabled: always          # ?? ?? ? ANSI ?? ?? ?? (?? ?? ??)
+      enabled: always         # Enable ANSI colors in console
   datasource:
     hikari:
-      auto-commit: false       # HikariCP ??? ??? ?? ???? ???? (???? ?? ??)
+      auto-commit: false      # Disable auto-commit for transactions
   jackson:
     serialization:
-      fail-on-empty-beans: false  # ? ?? ??? ?? ??
+      fail-on-empty-beans: false  # Prevent failure on empty beans
   jpa:
-    show-sql: true             # JPA ?? SQL ??? ??
-    hibernate:
-      ddl-auto: update         # ??? ?? ?? ?? (update: ??? ?? ? ??? ?? ????)
-    properties:
-      hibernate:
-        format_sql: true       # SQL? ?? ?? ????? ??
-        highlight_sql: true    # SQL ?? ?? ??
-        use_sql_comments: true # SQL? JPA? ?? ??? ??? ?? ??
+    show-sql: true                # Show SQL statements in logs
+    hibernate:                    # Hibernate-specific properties
+      ddl-auto: update            # Auto-update the database schema
+    properties:                   # Additional JPA properties
+      hibernate:                   # Hibernate-specific settings
+        format_sql: true           # Format SQL for readability
+        highlight_sql: true       # Highlight SQL keywords
+        use_sql_comments: true    # Include comments in SQL
 logging:
   level:
-    org.hibernate.orm.jdbc.bind: TRACE        # ???? SQL ???? ?? ?? (TRACE ??, ?? ??)
-    org.hibernate.orm.jdbc.extract: TRACE     # JDBC ?? ?? ?? ?? ??
-    org.springframework.transaction.interceptor: TRACE # ???? ??/??/?? ?? ?? ??
+    org.hibernate.orm.jdbc.bind: TRACE        # Log SQL parameter bindings
+    org.hibernate.orm.jdbc.extract: TRACE     # Log SQL result set extractions
+    org.springframework.transaction.interceptor: TRACE      # Log transaction boundaries
