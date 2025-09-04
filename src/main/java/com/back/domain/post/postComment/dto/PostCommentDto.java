@@ -1,4 +1,4 @@
-package com.back.domain.post.post.dto;
+package com.back.domain.post.postComment.dto;
 
 import com.back.domain.post.postComment.entity.PostComment;
 
