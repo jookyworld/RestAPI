@@ -52,7 +52,7 @@ public class ApiV1PostController {
         Post post = postService.create(reqBody.title(), reqBody.content());
 
         return new RsData<>(
-                "200-1",
+                "201-1",
                 "%d번 게시글이 작성되었습니다.".formatted(post.getId()),
                 new PostWriteResBody(postService.count(), new PostDto(post))
         );
