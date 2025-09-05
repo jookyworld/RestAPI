@@ -64,7 +64,7 @@ public class ApiV1PostController {
                          @Valid @RequestBody PostModifyReqBody reqBody) {
 
         Post post = postService.findById(id);
-        post.modify(reqBody.subject(), reqBody.body());
+        postService.update(post, reqBody.subject(), reqBody.body());
 
         return new RsData<>(
                 "200-1",
