@@ -45,7 +45,8 @@ public class ApiV1PostControllerTest {
         ).andDo(print());
 
         Post post = postService.findLatest().get();
-        long totalCount = postService.count();
+        String createdDate = String.valueOf(post.getCreateDate());
+        String modifiedDate = String.valueOf(post.getModifyDate());
 
         // 201 검증
         resultActions
@@ -54,8 +55,11 @@ public class ApiV1PostControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201-1"))
                 .andExpect(jsonPath("$.msg").value("%d번 게시글이 작성되었습니다.".formatted(post.getId())))
-                .andExpect(jsonPath("$.data.totalCount").value(totalCount))
-                .andExpect(jsonPath("$.data.post.id").value(post.getId()));
+                .andExpect(jsonPath("$.data.id").value(post.getId()))
+                .andExpect(jsonPath("$.data.createdDate").value(createdDate))
+                .andExpect(jsonPath("$.data.modifiedDate").value(modifiedDate))
+                .andExpect(jsonPath("$.data.subject").value("제목 new"))
+                .andExpect(jsonPath("$.data.body").value("내용 new"));
 
     }
 
