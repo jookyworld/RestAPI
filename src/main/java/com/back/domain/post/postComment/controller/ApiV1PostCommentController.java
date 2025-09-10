@@ -7,6 +7,8 @@ import com.back.domain.post.postComment.dto.PostCommentDto;
 import com.back.domain.post.postComment.dto.PostCommentModifyReqBody;
 import com.back.domain.post.postComment.entity.PostComment;
 import com.back.global.rsData.RsData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +19,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/posts/{postId}/comments")
 @RequiredArgsConstructor
+@Tag(name = "ApiV1PostCommentController", description = "댓글 컨트롤러")
 public class ApiV1PostCommentController {
     private final PostService postService;
 
     @Transactional(readOnly = true)
     @GetMapping()
+    @Operation(summary = "댓글 전체 조회")
     public List<PostCommentDto> getComments(@PathVariable long postId) {
         Post post = postService.findById(postId);
         List<PostComment> comments = post.getComments();
@@ -33,6 +37,7 @@ public class ApiV1PostCommentController {
 
     @Transactional(readOnly = true)
     @GetMapping("/{id}")
+    @Operation(summary = "댓글 단건 조회")
     public PostCommentDto getComment(@PathVariable("postId") long postId, @PathVariable("id") long id) {
         Post post = postService.findById(postId);
         PostComment postComment = post.findCommentById(id).get();
@@ -41,6 +46,7 @@ public class ApiV1PostCommentController {
 
     @Transactional
     @DeleteMapping("/{id}")
+    @Operation(summary = "댓글 삭제")
     public RsData<Void> deleteItem(@PathVariable long postId,  @PathVariable long id) {
         Post post = postService.findById(postId);
         PostComment postComment = post.findCommentById(id).get();
@@ -53,6 +59,7 @@ public class ApiV1PostCommentController {
 
     @Transactional
     @PutMapping("/{id}")
+    @Operation(summary = "댓글 수정")
     public RsData<Void> modify(@PathVariable long postId, @PathVariable long id,
                          @Valid @RequestBody PostCommentModifyReqBody reqBody) {
 
@@ -70,6 +77,7 @@ public class ApiV1PostCommentController {
 
     @Transactional
     @PostMapping
+    @Operation(summary = "댓글 작성")
     public RsData<PostCommentDto> create(@PathVariable long postId,
             @Valid @RequestBody PostCommentCreateReqBody body) {
 

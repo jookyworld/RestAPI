@@ -6,6 +6,8 @@ import com.back.domain.post.post.dto.PostWriteReqBody;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
 import com.back.global.rsData.RsData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +18,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController // @Controller + @ResponseBody
 @RequestMapping("/api/v1/posts")
+@Tag(name = "ApiV1PostController", description = "게시")
 public class ApiV1PostController {
     private final PostService postService;
 
     @Transactional(readOnly = true)
     @GetMapping
+    @Operation(summary = "전체 조회")
     public List<PostDto> getItems() {
         List<Post> items = postService.getList();
         return items
@@ -31,6 +35,7 @@ public class ApiV1PostController {
 
     @Transactional(readOnly = true)
     @GetMapping("/{id}")
+    @Operation(summary = "단건 조회")
     public PostDto getItem(@PathVariable long id) {
         Post post = postService.findById(id);
         return new PostDto(post);
@@ -38,6 +43,7 @@ public class ApiV1PostController {
 
     @DeleteMapping("/{id}")
     @Transactional
+    @Operation(summary = "삭제")
     public RsData<Void> deleteItem(@PathVariable long id) {
         Post post = postService.findById(id);
         postService.delete(post);
@@ -46,6 +52,7 @@ public class ApiV1PostController {
 
     @Transactional
     @PostMapping
+    @Operation(summary = "작성")
     public RsData<PostDto> write(@Valid @RequestBody PostWriteReqBody reqBody) {
 
         Post post = postService.create(reqBody.title(), reqBody.content());
@@ -59,6 +66,7 @@ public class ApiV1PostController {
 
     @PutMapping("{id}")
     @Transactional
+    @Operation(summary = "수정")
     public RsData<Void> modify(@PathVariable long id,
                          @Valid @RequestBody PostModifyReqBody reqBody) {
 
