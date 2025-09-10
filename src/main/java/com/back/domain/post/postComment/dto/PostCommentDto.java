@@ -9,7 +9,7 @@ public record PostCommentDto(
         long id,
         LocalDateTime createDate,
         LocalDateTime modifyDate,
-        String body
+        String content
 ) {
     public PostCommentDto(PostComment postComment) {
         this(

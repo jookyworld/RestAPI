@@ -2,6 +2,7 @@ package com.back.domain.post.postComment.controller;
 
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
+import com.back.domain.post.postComment.dto.PostCommentCreateReqBody;
 import com.back.domain.post.postComment.dto.PostCommentDto;
 import com.back.domain.post.postComment.dto.PostCommentModifyReqBody;
 import com.back.domain.post.postComment.entity.PostComment;
@@ -52,18 +53,36 @@ public class ApiV1PostCommentController {
 
     @Transactional
     @PutMapping("/{id}")
-    public RsData modify(@PathVariable long postId, @PathVariable long id,
+    public RsData<Void> modify(@PathVariable long postId, @PathVariable long id,
                          @Valid @RequestBody PostCommentModifyReqBody reqBody) {
 
         Post post = postService.findById(postId);
 
         PostComment postComment = post.findCommentById(id).get();
 
-        postService.modifyComment(postComment, reqBody.body());
+        postService.modifyComment(postComment, reqBody.content());
 
         return new RsData<>(
                 "200-1",
                 "%d번 댓글 수정".formatted(id)
         );
     }
+
+    @Transactional
+    @PostMapping
+    public RsData<PostCommentDto> create(@PathVariable long postId,
+            @Valid @RequestBody PostCommentCreateReqBody body) {
+
+        Post post = postService.findById(postId);
+        PostComment postComment = postService.createComment(post, body.content());
+
+        postService.flush();
+
+        return new RsData<>(
+                "201-1",
+                "%d번 댓글 작성".formatted(postComment.getId()),
+                new PostCommentDto(postComment)
+        );
+    }
+
 }

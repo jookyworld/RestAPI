@@ -59,7 +59,7 @@ public class ApiV1PostController {
 
     @PutMapping("{id}")
     @Transactional
-    public RsData modify(@PathVariable long id,
+    public RsData<Void> modify(@PathVariable long id,
                          @Valid @RequestBody PostModifyReqBody reqBody) {
 
         Post post = postService.findById(id);
