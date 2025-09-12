@@ -20,6 +20,7 @@ public class BaseInitData {
 
     private final PostService postService;
 
+
     @Bean
     ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {

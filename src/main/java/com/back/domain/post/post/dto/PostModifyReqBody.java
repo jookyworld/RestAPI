@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Size;
 public record PostModifyReqBody(
         @NotBlank
         @Size(min = 2, max = 100)
-        String subject,
+        String title,
 
         @NotBlank
         @Size(min = 2, max = 100)
-        String body
+        String content
 ) { }
