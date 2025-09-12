@@ -1,5 +1,7 @@
 package com.back.domain.post.postComment.controller;
 
+import com.back.domain.member.member.entity.Member;
+import com.back.domain.member.member.service.MemberService;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
 import com.back.domain.post.postComment.dto.PostCommentCreateReqBody;
@@ -82,7 +84,8 @@ public class ApiV1PostCommentController {
             @Valid @RequestBody PostCommentCreateReqBody body) {
 
         Post post = postService.findById(postId);
-        PostComment postComment = postService.createComment(post, body.content());
+        Member author = memberService.findByUsername("user1");
+        PostComment postComment = postService.createComment(author, post, body.content());
 
         postService.flush();
 
@@ -93,4 +96,5 @@ public class ApiV1PostCommentController {
         );
     }
 
+    private final MemberService memberService;
 }
