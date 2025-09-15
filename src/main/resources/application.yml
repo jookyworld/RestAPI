@@ -15,7 +15,7 @@ spring:
   jpa:
     show-sql: true                # Show SQL statements in logs
     hibernate:                    # Hibernate-specific properties
-      ddl-auto: create            # Auto-update the database schema
+      ddl-auto: update            # Auto-update the database schema
     properties:                   # Additional JPA properties
       hibernate:                   # Hibernate-specific settings
         format_sql: true           # Format SQL for readability
