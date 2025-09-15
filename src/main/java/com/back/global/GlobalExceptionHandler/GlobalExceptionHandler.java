@@ -1,6 +1,8 @@
 package com.back.global.GlobalExceptionHandler;
 
+import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,5 +19,14 @@ public class GlobalExceptionHandler {
                 "404-1",
                 "해당 데이터가 존재하지 않습니다."
         );
+    }
+
+    @ExceptionHandler(ServiceException.class)
+    public RsData<Void> handle(ServiceException e, HttpServletResponse response) {
+        RsData<Void>  rsData = e.getRsData();
+
+        response.setStatus(rsData.statusCode());
+
+        return rsData;
     }
 }

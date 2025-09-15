@@ -84,7 +84,7 @@ public class ApiV1PostCommentController {
             @Valid @RequestBody PostCommentCreateReqBody body) {
 
         Post post = postService.findById(postId);
-        Member author = memberService.findByUsername("user1");
+        Member author = memberService.findByUsername("user1").get();
         PostComment postComment = postService.createComment(author, post, body.content());
 
         postService.flush();
