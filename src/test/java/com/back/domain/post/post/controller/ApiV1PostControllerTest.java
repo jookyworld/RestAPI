@@ -60,6 +60,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.data.id").value(post.getId()))
                 .andExpect(jsonPath("$.data.createdDate").value(createdDate))
                 .andExpect(jsonPath("$.data.modifiedDate").value(modifiedDate))
+                .andExpect(jsonPath("$.data.authorName").value(post.getAuthor().getNickname()))
                 .andExpect(jsonPath("$.data.subject").value("제목 new"))
                 .andExpect(jsonPath("$.data.body").value("내용 new"));
 
@@ -140,6 +141,7 @@ public class ApiV1PostControllerTest {
                     .andExpect(jsonPath("$[%d].id".formatted(i)).value(post.getId()))
                     .andExpect(jsonPath("$[%d].createdDate".formatted(i)).value(Matchers.startsWith(post.getCreateDate().toString().substring(0, 20))))
                     .andExpect(jsonPath("$[%d].modifiedDate".formatted(i)).value(Matchers.startsWith(post.getModifyDate().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$[%d].authorName".formatted(i)).value(post.getAuthor().getNickname()))
                     .andExpect(jsonPath("$[%d].subject".formatted(i)).value(post.getTitle()))
                     .andExpect(jsonPath("$[%d].body".formatted(i)).value(post.getContent()));
         }

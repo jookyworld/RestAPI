@@ -11,12 +11,16 @@ import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @RequiredArgsConstructor
 @RestController // @Controller + @ResponseBody
 @RequestMapping("/api/v1/posts")
@@ -56,9 +60,10 @@ public class ApiV1PostController {
     @Transactional
     @PostMapping
     @Operation(summary = "작성")
-    public RsData<PostDto> write(@Valid @RequestBody PostWriteReqBody reqBody) {
+    public RsData<PostDto> write(@Valid @RequestBody PostWriteReqBody reqBody,
+                                 @NotBlank @Size(min = 2, max = 30) String username) {
 
-        Member author = memberService.findByUsername("user1");
+        Member author = memberService.findByUsername(username);
 
         Post post = postService.create(author, reqBody.title(), reqBody.content());
 
