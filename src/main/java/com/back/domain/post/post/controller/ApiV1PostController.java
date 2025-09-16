@@ -1,19 +1,16 @@
 package com.back.domain.post.post.controller;
 
 import com.back.domain.member.member.entity.Member;
-import com.back.domain.member.member.service.MemberService;
 import com.back.domain.post.post.dto.PostDto;
 import com.back.domain.post.post.dto.PostModifyReqBody;
 import com.back.domain.post.post.dto.PostWriteReqBody;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
-import com.back.global.exception.ServiceException;
+import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +25,7 @@ import java.util.List;
 @Tag(name = "ApiV1PostController", description = "게시")
 public class ApiV1PostController {
     private final PostService postService;
-    private final MemberService memberService;
+    private final Rq rq;
 
     @Transactional(readOnly = true)
     @GetMapping
@@ -52,15 +49,13 @@ public class ApiV1PostController {
     @DeleteMapping("/{id}")
     @Transactional
     @Operation(summary = "삭제")
-    public RsData<Void> deleteItem(@PathVariable long id,
-                                   @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization) {
-        String apiKey = authorization.replace("Bearer ", "");
-        Member author = memberService.findByApiKey(apiKey)
-                .orElseThrow(() -> new ServiceException("401-1", "준재하지 않는 회원입니다."));
+    public RsData<Void> delete(@PathVariable long id) {
+        Member actor = rq.getActor();
+
         Post post = postService.findById(id);
-        if (!author.equals(post.getAuthor())) {
-            throw new ServiceException("403-1", "글 삭제 권한이 없습니다.");
-        }
+
+        post.checkActorCanDelete(actor);
+
         postService.delete(post);
         return new RsData<>("200-1", "%d번 게시글이 삭제되었습니다.".formatted(id));
     }
@@ -68,15 +63,12 @@ public class ApiV1PostController {
     @Transactional
     @PostMapping
     @Operation(summary = "작성")
-    public RsData<PostDto> write(@Valid @RequestBody PostWriteReqBody reqBody,
-                                 @NotBlank @Size(min = 2, max = 60) @RequestHeader("Authorization") String authorization) {
+    public RsData<PostDto> write(@Valid @RequestBody PostWriteReqBody reqBody) {
 
-        String apiKey = authorization.replace("Bearer ", "");
+        System.out.println("rq.getActor: " + rq.getActor());
+        Member actor = rq.getActor();
 
-        Member author = memberService.findByApiKey(apiKey)
-                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
-
-        Post post = postService.create(author, reqBody.title(), reqBody.content());
+        Post post = postService.create(actor, reqBody.title(), reqBody.content());
 
         return new RsData<>(
                 "201-1",
@@ -89,19 +81,13 @@ public class ApiV1PostController {
     @Transactional
     @Operation(summary = "수정")
     public RsData<Void> modify(@PathVariable long id,
-                         @Valid @RequestBody PostModifyReqBody reqBody,
-                               @NotBlank @Size(min = 2, max = 60) @RequestHeader("Authorization") String authorization) {
+                         @Valid @RequestBody PostModifyReqBody reqBody) {
 
-        String apiKey = authorization.replace("Bearer ", "");
-
-        Member author = memberService.findByApiKey(apiKey).orElseThrow(
-                () -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
+        Member actor = rq.getActor();
 
         Post post = postService.findById(id);
 
-        if (!author.equals(post.getAuthor())) {
-            throw new ServiceException("403-1", "글 수정 권한이 없습니다.");
-        }
+        post.checkActorCanModify(actor);
 
         postService.update(post, reqBody.title(), reqBody.content());
 

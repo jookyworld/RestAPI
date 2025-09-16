@@ -8,13 +8,11 @@ import com.back.domain.post.postComment.dto.PostCommentCreateReqBody;
 import com.back.domain.post.postComment.dto.PostCommentDto;
 import com.back.domain.post.postComment.dto.PostCommentModifyReqBody;
 import com.back.domain.post.postComment.entity.PostComment;
-import com.back.global.exception.ServiceException;
+import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +26,7 @@ import java.util.List;
 public class ApiV1PostCommentController {
     private final PostService postService;
     private final MemberService memberService;
+    private final Rq rq;
 
     @Transactional(readOnly = true)
     @GetMapping()
@@ -53,18 +52,13 @@ public class ApiV1PostCommentController {
     @Transactional
     @DeleteMapping("/{id}")
     @Operation(summary = "댓글 삭제")
-    public RsData<Void> deleteItem(@PathVariable long postId, @PathVariable long id,
-                                   @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization) {
-        String apiKey = authorization.replace("Bearer ", "");
-        Member author = memberService.findByApiKey(apiKey)
-                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
+    public RsData<Void> deleteItem(@PathVariable long postId, @PathVariable long id) {
+        Member actor = rq.getActor();
 
         Post post = postService.findById(postId);
         PostComment postComment = post.findCommentById(id).get();
 
-        if (!postComment.getAuthor().equals(author)) {
-            throw new ServiceException("403-1", "댓글 삭제 권한이 없습니다.");
-        }
+        postComment.checkActorCanDeleteComment(actor);
 
         postService.deleteComment(post, postComment);
 
@@ -76,19 +70,13 @@ public class ApiV1PostCommentController {
     @PutMapping("/{id}")
     @Operation(summary = "댓글 수정")
     public RsData<Void> modify(@PathVariable long postId, @PathVariable long id,
-                         @Valid @RequestBody PostCommentModifyReqBody reqBody,
-                               @NotBlank @Size(min = 2, max = 60) @RequestHeader("Authorization") String authorization) {
-
-        String apiKey = authorization.replace("Bearer ", "");
-        Member author = memberService.findByApiKey(apiKey)
-                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
+                         @Valid @RequestBody PostCommentModifyReqBody reqBody) {
+        Member actor = rq.getActor();
 
         Post post = postService.findById(postId);
         PostComment postComment = post.findCommentById(id).get();
 
-        if (!author.equals(postComment.getAuthor())) {
-            throw new ServiceException("403-1", "댓글 수정 권한이 없습니다.");
-        }
+        postComment.checkActorCanModifyComment(actor);
 
         postService.modifyComment(postComment, reqBody.content());
 
@@ -101,17 +89,13 @@ public class ApiV1PostCommentController {
     @Transactional
     @PostMapping
     @Operation(summary = "댓글 작성")
-    public RsData<PostCommentDto> create(@PathVariable long postId,
-                                         @Valid @RequestBody PostCommentCreateReqBody body,
-                                         @NotBlank @Size(min = 2, max = 60) @RequestHeader("Authorization") String authorization) {
-
-        String apiKey = authorization.replace("Bearer ", "");
-        Member author = memberService.findByApiKey(apiKey)
-                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
+    public RsData<PostCommentDto> write(@PathVariable long postId,
+                                         @Valid @RequestBody PostCommentCreateReqBody body) {
+        Member actor = rq.getActor();
 
         Post post = postService.findById(postId);
 
-        PostComment postComment = postService.createComment(author, post, body.content());
+        PostComment postComment = postService.createComment(actor, post, body.content());
 
         postService.flush();
 

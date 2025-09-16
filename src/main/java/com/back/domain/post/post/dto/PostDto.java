@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 
 public record PostDto(
         long id,
-        LocalDateTime createdDate,
-        LocalDateTime modifiedDate,
+        LocalDateTime createDate,
+        LocalDateTime modifyDate,
         String authorName,
-        String subject,
-        String body
+        String title,
+        String content
 ) {
     public PostDto(Post post) {
         this(
