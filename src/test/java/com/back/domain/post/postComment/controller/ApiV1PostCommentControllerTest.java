@@ -89,8 +89,13 @@ public class ApiV1PostCommentControllerTest {
     void t3() throws Exception {
         long postId = 1;
         long id = 1;
+
+        Post post = postService.findById(postId);
+        String apiKey = post.getAuthor().getApiKey();
+
         ResultActions resultActions = mvc
-                .perform(delete("/api/v1/posts/%d/comments/%d".formatted(postId, id)))
+                .perform(delete("/api/v1/posts/%d/comments/%d".formatted(postId, id))
+                        .header("Authorization", "Bearer " + apiKey))
                 .andDo(print());
 
         resultActions
@@ -107,10 +112,13 @@ public class ApiV1PostCommentControllerTest {
     void t4() throws Exception {
         long postId = 1;
         long id = 1;
+        Post post = postService.findById(postId);
+        String apiKey = post.getAuthor().getApiKey();
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/%d/comments/%d".formatted(postId, id))
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + apiKey)
                                 .content("""
                                         {
                                             "content" : "제목 update"
@@ -131,10 +139,14 @@ public class ApiV1PostCommentControllerTest {
     @DisplayName("댓글 등록")
     void t5() throws Exception {
         long postId = 1;
+        Post beforePost = postService.findById(postId);
+        String apiKey = beforePost.getAuthor().getApiKey();
+
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts/%d/comments".formatted(postId))
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + apiKey)
                                 .content("""
                                         {
                                             "content" : "내용 new"

@@ -8,10 +8,13 @@ import com.back.domain.post.postComment.dto.PostCommentCreateReqBody;
 import com.back.domain.post.postComment.dto.PostCommentDto;
 import com.back.domain.post.postComment.dto.PostCommentModifyReqBody;
 import com.back.domain.post.postComment.entity.PostComment;
+import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,7 @@ import java.util.List;
 @Tag(name = "ApiV1PostCommentController", description = "댓글 컨트롤러")
 public class ApiV1PostCommentController {
     private final PostService postService;
+    private final MemberService memberService;
 
     @Transactional(readOnly = true)
     @GetMapping()
@@ -49,9 +53,18 @@ public class ApiV1PostCommentController {
     @Transactional
     @DeleteMapping("/{id}")
     @Operation(summary = "댓글 삭제")
-    public RsData<Void> deleteItem(@PathVariable long postId,  @PathVariable long id) {
+    public RsData<Void> deleteItem(@PathVariable long postId, @PathVariable long id,
+                                   @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization) {
+        String apiKey = authorization.replace("Bearer ", "");
+        Member author = memberService.findByApiKey(apiKey)
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
+
         Post post = postService.findById(postId);
         PostComment postComment = post.findCommentById(id).get();
+
+        if (!postComment.getAuthor().equals(author)) {
+            throw new ServiceException("403-1", "댓글 삭제 권한이 없습니다.");
+        }
 
         postService.deleteComment(post, postComment);
 
@@ -63,11 +76,19 @@ public class ApiV1PostCommentController {
     @PutMapping("/{id}")
     @Operation(summary = "댓글 수정")
     public RsData<Void> modify(@PathVariable long postId, @PathVariable long id,
-                         @Valid @RequestBody PostCommentModifyReqBody reqBody) {
+                         @Valid @RequestBody PostCommentModifyReqBody reqBody,
+                               @NotBlank @Size(min = 2, max = 60) @RequestHeader("Authorization") String authorization) {
+
+        String apiKey = authorization.replace("Bearer ", "");
+        Member author = memberService.findByApiKey(apiKey)
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
 
         Post post = postService.findById(postId);
-
         PostComment postComment = post.findCommentById(id).get();
+
+        if (!author.equals(postComment.getAuthor())) {
+            throw new ServiceException("403-1", "댓글 수정 권한이 없습니다.");
+        }
 
         postService.modifyComment(postComment, reqBody.content());
 
@@ -81,10 +102,15 @@ public class ApiV1PostCommentController {
     @PostMapping
     @Operation(summary = "댓글 작성")
     public RsData<PostCommentDto> create(@PathVariable long postId,
-            @Valid @RequestBody PostCommentCreateReqBody body) {
+                                         @Valid @RequestBody PostCommentCreateReqBody body,
+                                         @NotBlank @Size(min = 2, max = 60) @RequestHeader("Authorization") String authorization) {
+
+        String apiKey = authorization.replace("Bearer ", "");
+        Member author = memberService.findByApiKey(apiKey)
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
 
         Post post = postService.findById(postId);
-        Member author = memberService.findByUsername("user1").get();
+
         PostComment postComment = postService.createComment(author, post, body.content());
 
         postService.flush();
@@ -95,6 +121,4 @@ public class ApiV1PostCommentController {
                 new PostCommentDto(postComment)
         );
     }
-
-    private final MemberService memberService;
 }

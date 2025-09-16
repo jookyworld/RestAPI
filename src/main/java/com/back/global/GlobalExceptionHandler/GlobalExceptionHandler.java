@@ -4,11 +4,15 @@ import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.NoSuchElementException;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,5 +32,17 @@ public class GlobalExceptionHandler {
         response.setStatus(rsData.statusCode());
 
         return rsData;
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<RsData<Void>> handle(MissingRequestHeaderException e) {
+
+        return new ResponseEntity<>(
+                new RsData<>(
+                        "400-1",
+                        "회원정보를 찾을 수 없습니다."
+                ),
+                BAD_REQUEST
+        );
     }
 }
