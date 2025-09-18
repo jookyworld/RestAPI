@@ -27,4 +27,4 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE     # Log SQL result set extractions
     org.springframework.transaction.interceptor: TRACE      # Log transaction boundaries
 springdoc:
-  default-produces-media-type: application/json:charset=UTF-8
+  default-produces-media-type: application/json

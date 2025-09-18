@@ -54,9 +54,16 @@ public class Rq {
     }
 
     public void setCookie(String key, String value) {
+        if(value == null) value = "";
+
         Cookie cookie = new Cookie(key, value);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+
+        if (value.isBlank()) {
+            cookie.setMaxAge(0);
+        }
+
         response.addCookie(cookie);
     }
 
@@ -73,4 +80,7 @@ public class Rq {
                 .orElse(defaultValue);
     }
 
+    public void deleteCookie(String name) {
+        setCookie(name, null);
+    }
 }
