@@ -3,6 +3,7 @@ spring:
     name: RestAPI     # Application name
   profiles:
     active: dev        # Active profile (dev, test, prod)
+    include: secret
   output:
     ansi:
       enabled: always         # Enable ANSI colors in console

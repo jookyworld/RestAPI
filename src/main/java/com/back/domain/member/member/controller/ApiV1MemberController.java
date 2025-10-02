@@ -43,14 +43,18 @@ public class ApiV1MemberController {
             throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
 
+        String accessToken = memberService.getAccessToken(member);
+
         rq.setCookie("apiKey", member.getApiKey());
+        rq.setCookie("accessToken", accessToken);
 
         return new RsData<>(
                 "200-1",
                 "%s님 환영합니다.".formatted(member.getNickname()),
                 new MemberLoginResponseBody(
                         new MemberDto(member),
-                        member.getApiKey())
+                        member.getApiKey(),
+                        accessToken)
         );
     }
 
@@ -66,5 +70,4 @@ public class ApiV1MemberController {
 
         return new RsData<>("200-1", "로그아웃 되었습니다.");
     }
-
 }
